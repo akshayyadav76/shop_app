@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-class Products {
+class Product {
   @required
   final String id;
   @required
@@ -13,7 +13,7 @@ class Products {
   final String imageUrl;
   bool isfavorite;
 
-  Products(
+  Product(
       {this.id,
       this.title,
       this.description,
