@@ -8,11 +8,17 @@ import '../providers/Product.dart';
 
 
 class ProdcutGrid extends StatelessWidget {
+
+  var favotievalue;
+
+  ProdcutGrid(this.favotievalue);
+
+
   @override
   Widget build(BuildContext context) {
 
     final productData = Provider.of<Products>(context);
-    final products =productData.items;
+    final products =favotievalue ? productData.favoritesItems:productData.items;
 
     return GridView.builder(
       itemCount: products.length,
