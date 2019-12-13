@@ -20,6 +20,11 @@ class Cart with ChangeNotifier {
     return _cartaItems;
 }
 
+void deleteCart(String id){
+    _cartaItems.remove(id);
+    notifyListeners();
+}
+
 double get totalAmount{
     var total =0.0;
    _cartaItems.forEach((di,cartitems){
@@ -29,6 +34,11 @@ double get totalAmount{
 
    int get cartCount  {
     return _cartaItems.length;
+}
+
+void cartClear(){
+    _cartaItems={};
+    notifyListeners();
 }
 
   void addCart(String id, String title, double price) {

@@ -57,10 +57,13 @@ class ProductItem extends StatelessWidget {
             ),
             onPressed: ()=> cartItems.addCart(product.id, product.title, product.price),
           ),
-          title: Text(
-            product.title,
-            textAlign: TextAlign.center,
+          title: FittedBox(
+            child: Text(
+                product.title,style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
           ),
+
           backgroundColor: Colors.black54,
         ),
       ),
