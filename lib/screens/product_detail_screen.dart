@@ -24,7 +24,7 @@ class ProductDetailScreen extends StatelessWidget {
           Container(
             height: 400,
               width: double.infinity,
-              child: Image.network("${loadedProdcuts.imageUrl}",fit: BoxFit.cover                ,)
+              child: Image.network("${loadedProdcuts.imageUrl}",fit: BoxFit.cover,)
           ,
           ),
           Text("${loadedProdcuts.price}"),

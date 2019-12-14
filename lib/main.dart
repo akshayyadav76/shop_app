@@ -9,14 +9,11 @@ import './screens/cart_screen.dart';
 import './providers/orders.dart';
 import './screens/order_screen.dart';
 
-void todo(){}
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
 
-  void check(){
-    String see ="is it working accourding to you";
-  }
 
 
   @override

@@ -15,6 +15,20 @@ class CartItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(key: ValueKey(id),
+      confirmDismiss: (direction){
+      return showDialog(context: context,builder: (ctx){
+       return AlertDialog(title: Text("are you sure?"),content: Text("do you wnat to remove from card"),
+       actions: <Widget>[
+         FlatButton(child: Text("No"),onPressed: (){
+           Navigator.of(ctx).pop(false);
+         },),
+         FlatButton(child: Text("yes"),onPressed: (){
+           Navigator.of(ctx).pop(true);
+         },)
+       ],
+       );
+      });
+      },
       background: Container(color: Colors.red,child: Icon(Icons.delete),alignment:Alignment.centerRight,),
       direction: DismissDirection.endToStart,
       onDismissed: (dir){
