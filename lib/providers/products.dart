@@ -65,4 +65,20 @@ class Products with ChangeNotifier{
     notifyListeners();
 
   }
+
+  void updateProducts(String id,Product newProcut){
+    final productIndex=items.indexWhere((te){return te.id ==id;});
+    if(productIndex>=0){
+      _items[productIndex] =newProcut;
+      notifyListeners();
+    }else{
+      print("dd");
+    }
+
+  }
+
+  void deleteProduct(String id){
+    _items.removeWhere((dd){return dd.id ==id;});
+    notifyListeners();
+  }
 }
