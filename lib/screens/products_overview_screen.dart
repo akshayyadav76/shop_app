@@ -6,6 +6,7 @@ import '../widgets/badge.dart.dart';
 import '../providers/cart.dart';
 import '../screens/cart_screen.dart';
 import '../widgets/app_drawer.dart';
+import '../providers/products.dart';
 
 enum filterOptions {
   favorites,
@@ -19,6 +20,26 @@ class ProductOverviewScreen extends StatefulWidget {
 
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   var _SelectedFavorites = false;
+  var isinit =true;
+
+  @override
+  void initState() {
+    //Provider.of<Products>(context).getData(); don't work here there is no context...works only if lisen false
+
+//        Future.delayed(Duration.zero).then((_){   //it also work for modelsheet and where we need context in inintstate
+//      //Provider.of<Products>(context).getData();
+//     });
+
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if(isinit){
+    Provider.of<Products>(context).getData();}
+    isinit =false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {

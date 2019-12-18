@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import 'Product.dart';
 
 class Products with ChangeNotifier{
+static const url="https://fir-9a1fe.firebaseio.com/products.json";
 
   List<Product> _items = [
 
@@ -53,16 +57,51 @@ class Products with ChangeNotifier{
    return _items.firstWhere((list)=>list.id ==id);
   }
 
+  Future<void> getData()async{
+    try{
 
-  void addProduct(Product productt){
-   final _enterNewProduct= Product(title: productt.title,
-      imageUrl: productt.imageUrl,description: productt.description,
-    price: productt.price,id: DateTime.now().toString(),
-    );
-   _items.add(_enterNewProduct);
-  // _items.insert(0, _enterNewProduct) at 0 intex will added
+    final getresponse=await http.get(url);
+    print(json.decode(getresponse.body));
+    final extractedData=json.decode(getresponse.body) as Map<String,dynamic> ;
 
-    notifyListeners();
+  }catch(er){
+      throw er;
+    }
+  }
+
+  Future<void> addProduct(Product productt)async{
+
+
+    try {
+
+      final response = await http.post(url, body: json.encode({
+        "title": productt.title,
+        "description": productt.description,
+        "price": productt.price,
+        "imageUrl": productt.imageUrl,
+        "IsFavorite": productt.isfavorite
+      }));
+      print(json.decode(response.body));
+      final _enterNewProduct= Product(
+        title: productt.title,
+        imageUrl: productt.imageUrl,
+        description: productt.description,
+        price: productt.price,
+        id: json.decode(response.body)['name'],
+      );
+      _items.add(_enterNewProduct);
+      // _items.insert(0, _enterNewProduct) at 0 intex will added
+      notifyListeners();
+    }catch(error){
+      print(error);
+      throw error;
+    }
+
+
+
+
+   //return Future.value();
+
 
   }
 
