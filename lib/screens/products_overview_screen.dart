@@ -21,7 +21,7 @@ class ProductOverviewScreen extends StatefulWidget {
 class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   var _SelectedFavorites = false;
   var isinit =true;
-
+  var isLoading = false;
   @override
   void initState() {
     //Provider.of<Products>(context).getData(); don't work here there is no context...works only if lisen false
@@ -36,7 +36,15 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   @override
   void didChangeDependencies() {
     if(isinit){
-    Provider.of<Products>(context).getData();}
+      setState(() {
+        isLoading =true;
+      });
+    Provider.of<Products>(context).getData().then((_){
+      setState(() {
+        isLoading =false;
+      });
+    });
+    }
     isinit =false;
     super.didChangeDependencies();
   }
@@ -82,7 +90,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
           ),
         ],
       ),
-      body: ProdcutGrid(_SelectedFavorites),
+      body: isLoading ? Center(child: CircularProgressIndicator()):ProdcutGrid(_SelectedFavorites),
       drawer: AppDrawer(),
     );
   }

@@ -87,11 +87,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
     _formkey.currentState.save();
     if (_editedProdcut.id != null) {
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false)
           .updateProducts(_editedProdcut.id, _editedProdcut);
-      setState(() {
-        isProgress = false;
-      });
+
       Navigator.of(context).pop();
     } else {
       try{
@@ -113,13 +111,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ],
             )
         );
-      }finally{
-        setState(() {
-          isProgress = false;
-        });
-        Navigator.of(context).pop();
       }
+//      finally{
+//        setState(() {
+//          isProgress = false;
+//        });
+//        Navigator.of(context).pop();
+//      }
     }
+    setState(() {
+      isProgress = false;
+    });
+    Navigator.of(context).pop();
   }
 
   @override

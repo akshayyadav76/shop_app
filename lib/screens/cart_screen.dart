@@ -28,12 +28,7 @@ class CartScreen extends StatelessWidget {
             Spacer(),
             Chip(label: Text("\$${cartdata.totalAmount.toStringAsFixed(2)}",
               style: TextStyle(color: Colors.red),),),
-            FlatButton(child: Text("order"), onPressed: () {
-             Provider.of<Order>(context,listen: false).add(cartdata.cartItems.values.toList(),
-                  cartdata.totalAmount
-              );
-             cartdata.cartClear();
-            },)
+            flateButton(cartdata),
           ],
         ),),
     ),
@@ -50,3 +45,44 @@ class CartScreen extends StatelessWidget {
     );
   }
 }
+
+
+class flateButton extends StatefulWidget {
+
+  final  Cart cart;
+  flateButton(this.cart);
+
+
+
+  @override
+  _flateButtonState createState() => _flateButtonState();
+}
+
+class _flateButtonState extends State<flateButton> {
+    //final dd;
+  var isLoading =false;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      child: isLoading ?CircularProgressIndicator():Text("order"),
+      onPressed: (widget.cart.totalAmount<=0|| isLoading)?null:()
+      async{
+        setState(() {
+          isLoading =true;
+        });
+     await Provider.of<Order>(context,listen: false).add(
+          widget.cart.cartItems.values.toList(),
+          widget.cart.totalAmount
+     );
+     setState(() {
+       isLoading =false;
+     });
+
+
+          widget.cart.cartClear();
+       },
+    );
+  }
+}
+
