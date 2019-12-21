@@ -10,7 +10,8 @@ import './providers/orders.dart';
 import './screens/order_screen.dart';
 import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
-
+import  './screens/auth_screen.dart';
+import './providers/auth.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,7 +25,9 @@ class MyApp extends StatelessWidget {
         providers:[
         ChangeNotifierProvider.value(value: Products(),),
         ChangeNotifierProvider.value(value: Cart()),
-          ChangeNotifierProvider.value(value: Order()),
+          ChangeNotifierProvider.value(value: Order(),),
+          ChangeNotifierProvider.value(value: Auth())
+
     ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -34,13 +37,14 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.deepOrange,
           fontFamily: "Lato",
         ),
-        home: ProductOverviewScreen(),
+        home:  AuthScreen(),                  //ProductOverviewScreen(),
         routes: {
          ProductDetailScreen.routeName :(cont)=>ProductDetailScreen(),
           CartScreen.cartRoute:(context)=>CartScreen(),
           OrderScreen.routeName:(con)=>OrderScreen(),
           UserProductScreen.routeName:(context)=>UserProductScreen(),
           EditProductScreen.routeName:(context)=>EditProductScreen(),
+          AuthScreen.routeName:(context)=>AuthScreen(),
         },
 
       ),
