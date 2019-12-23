@@ -30,17 +30,14 @@ class Product with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void> tonggleFavoriteStatus()async{
-    final url="https://fir-9a1fe.firebaseio.com/products/$id.json";
+  Future<void> tonggleFavoriteStatus(String token, String userId)async{
+    final url="https://fir-9a1fe.firebaseio.com/userFavorites/$userId/$id.json?auth=$token";
     final oldStatus =isfavorite;
     isfavorite = !isfavorite;
     notifyListeners();
 
     try{
-    final reponse = await http.patch(url,body: json.encode({
-      "IsFavorite": isfavorite
-    })
-    );
+    final reponse = await http.put(url,body: json.encode(isfavorite));
     if(reponse.statusCode >= 400 ){
       _setvalue(oldStatus);
     }

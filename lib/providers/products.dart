@@ -6,8 +6,9 @@ import 'package:http/http.dart' as http;
 import 'Product.dart';
 import '../models/http_exception.dart';
 
+
 class Products with ChangeNotifier{
-static const url="https://fir-9a1fe.firebaseio.com/products.json";
+
 
   List<Product> _items = [
 
@@ -44,7 +45,10 @@ static const url="https://fir-9a1fe.firebaseio.com/products.json";
 //      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
 //    ),
   ];
+  String token;
+  final String userId;
 
+Products(this.token,this.userId,this._items,);
 
   List<Product> get items{
     return [..._items];
@@ -59,13 +63,17 @@ static const url="https://fir-9a1fe.firebaseio.com/products.json";
   }
 
   Future<void> getData()async{
+    var  url="https://fir-9a1fe.firebaseio.com/products.json?auth=$token&orderBy='creater'&equalTo='$userId'";
     try{
     final getresponse=await http.get(url);
     print(json.decode(getresponse.body));
     final extractedData=json.decode(getresponse.body) as Map<String,dynamic> ;
-    if(extractedData==null){return;}
+    if(extractedData==null){return;
+    }
     print(extractedData);
-
+    url ="https://fir-9a1fe.firebaseio.com/userFavorites/$userId.json?auth=$token";
+   final favoritResponse= await http.get(url);
+   final favoritData=json.decode(favoritResponse.body);
     final List<Product> LoadedList =[];
 
     extractedData.forEach((productId,productData){
@@ -76,7 +84,7 @@ static const url="https://fir-9a1fe.firebaseio.com/products.json";
         description: productData['description'],
         price: productData['price'],
         imageUrl: productData['imageUrl'],
-        isfavorite: productData['IsFavorite']
+        isfavorite: favoritData == null?false:favoritData[productId]??false
       ));
     });
     _items= LoadedList;
@@ -88,7 +96,7 @@ static const url="https://fir-9a1fe.firebaseio.com/products.json";
   }
 
   Future<void> addProduct(Product productt)async{
-
+    final url="https://fir-9a1fe.firebaseio.com/products.json?auth=$token";
 
     try {
 
@@ -97,7 +105,8 @@ static const url="https://fir-9a1fe.firebaseio.com/products.json";
         "description": productt.description,
         "price": productt.price,
         "imageUrl": productt.imageUrl,
-        "IsFavorite": productt.isfavorite
+        'creater': userId
+        //"IsFavorite": productt.isfavorite
       }));
       print(json.decode(response.body));
 
@@ -129,7 +138,7 @@ static const url="https://fir-9a1fe.firebaseio.com/products.json";
 
     final productIndex=items.indexWhere((te){return te.id ==id;});
     if(productIndex>=0){
-      final url="https://fir-9a1fe.firebaseio.com/products/$id";
+      final url="https://fir-9a1fe.firebaseio.com/products/$id.json?auth=$token";
      await http.patch(url,body: json.encode({
 
         "title": newProcut.title,
@@ -152,7 +161,7 @@ static const url="https://fir-9a1fe.firebaseio.com/products.json";
     // 200 201 everyting is right
     //300 you were redericted 400 something is wrong
 
-    final url="https://fir-9a1fe.firebaseio.com/products/$id.json";
+    final url="https://fir-9a1fe.firebaseio.com/products/$id.json?auth=$token";
     final exeistingProductIndex =_items.indexWhere((dd){return dd.id ==id;});
     var exstingProduct =_items[exeistingProductIndex];
     _items.removeAt(exeistingProductIndex);

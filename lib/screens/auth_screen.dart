@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
+import '../models/http_exception.dart';
 
 enum authMode { Signup, Login }
 
@@ -106,6 +107,14 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading=false;
   final _passwordControler =TextEditingController();
 
+  void _errorDiloag(String massage){
+     showDialog(context:context,builder: (context){
+      return AlertDialog(title: Text("error massage"),content: Text("someting went wrong"),
+      actions: <Widget>[FlatButton(child: Text("OK"),onPressed: (){
+        Navigator.of(context).pop();
+      },)],);
+    } );
+  }
 
   Future<void> _sumbit()async{
     if(!key.currentState.validate()){
@@ -115,12 +124,29 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading =true;
     });
-    if(_mode ==authMode.Login){
 
+    try{
+    if(_mode ==authMode.Login){
+      await Provider.of<Auth>(context,listen: false).
+      signIn(credentials['email'], credentials['password']);
     }else{
       print(credentials["email"]);
-      await Provider.of<Auth>(context,listen: false).signup(credentials['email'], credentials['password']);
+      await Provider.of<Auth>(context,listen: false).
+      signup(credentials['email'], credentials['password']);
+    }} on HttpException catch(errr){
+      var errorMassae="authenticate faild";
+      if(errr.toString().contains('EMAIL_EXISTS')){
+        errorMassae ="this email addred is wrong";
+      }else if(errr.toString().contains("EMAIL_NOT_FOUND")){
+        errorMassae="email not found ";
+      }
+       _errorDiloag(errorMassae);
+
+    }catch(error){
+      var erroMassage="could not authicte";
+      _errorDiloag(erroMassage);
     }
+
     setState(() {
       _isLoading =false;
     });
