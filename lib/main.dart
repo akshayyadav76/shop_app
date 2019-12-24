@@ -12,7 +12,7 @@ import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
 import  './screens/auth_screen.dart';
 import './providers/auth.dart';
-
+import './screens/splashScreen.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: Cart()),
           ChangeNotifierProxyProvider<Auth,Order>(update: (
               context,auth,previousOrders){
-            return Order(auth.token,previousOrders ==null?[]:previousOrders.orders);
+            return Order(auth.token,auth.userId,previousOrders ==null?[]:previousOrders.orders);
           },create: (context){return null;},),
 
 
@@ -46,7 +46,15 @@ class MyApp extends StatelessWidget {
             accentColor: Colors.deepOrange,
             fontFamily: "Lato",
           ),
-          home: data.isAuth ?ProductOverviewScreen(): AuthScreen(),                  //ProductOverviewScreen(),
+          home: data.isAuth ?
+          ProductOverviewScreen()
+          : FutureBuilder(
+            future: data.tryAutolog(),
+          builder: (context,snapshot)=>
+          snapshot.connectionState==ConnectionState.waiting?SplashScreen():AuthScreen(),
+          ),
+
+               //ProductOverviewScreen(),
           routes: {
             ProductDetailScreen.routeName :(cont)=>ProductDetailScreen(),
             CartScreen.cartRoute:(context)=>CartScreen(),

@@ -62,11 +62,16 @@ Products(this.token,this.userId,this._items,);
    return _items.firstWhere((list)=>list.id ==id);
   }
 
-  Future<void> getData()async{
-    var  url="https://fir-9a1fe.firebaseio.com/products.json?auth=$token&orderBy='creater'&equalTo='$userId'";
+  Future<void> getData([bool firlterByUser =false])async{
+    final filerUrl =firlterByUser?'orderBy="creater"&equalTo="$userId"':'';
+ var  url='https://fir-9a1fe.firebaseio.com/products.json?auth=$token&$filerUrl';
+
+   // https://fir-9a1fe.firebaseio.com/products/-LwMav6Rcg9cpPMpEkNu/creater
+    //print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww$url");
+
     try{
     final getresponse=await http.get(url);
-    print(json.decode(getresponse.body));
+    //print('AAAAAAAAAAAAAAAAAAAAAAAA${json.encode(getresponse.body)}');
     final extractedData=json.decode(getresponse.body) as Map<String,dynamic> ;
     if(extractedData==null){return;
     }
