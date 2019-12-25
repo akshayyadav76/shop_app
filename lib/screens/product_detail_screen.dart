@@ -18,20 +18,47 @@ class ProductDetailScreen extends StatelessWidget {
     final loadedProdcuts=Provider.of<Products>(context).findById(productId);
 
     return Scaffold(
-      appBar: AppBar(title: Text(loadedProdcuts.title),),
-      body: Column(
-        children: <Widget>[
-          Container(
-            height: 400,
-              width: double.infinity,
-              child: Image.network("${loadedProdcuts.imageUrl}",fit: BoxFit.cover,)
-          ,
+     // appBar: AppBar(title: Text(loadedProdcuts.title),),
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            expandedHeight:  360,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(title: Text(loadedProdcuts.title),
+            background: Hero(
+                tag: loadedProdcuts.id,
+                child: Image.network("${loadedProdcuts.imageUrl}",fit: BoxFit.cover,)),
+            ),
           ),
-          Text("${loadedProdcuts.price}"),
-          Text("${loadedProdcuts.title}")
+          SliverList(
+            delegate:SliverChildListDelegate(
+              [
+                SizedBox(height: 10,),
 
+                Text("${loadedProdcuts.price}"),
+                SizedBox(height: 10,),
 
+                Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    width: double.infinity,
+                    child: Text("${loadedProdcuts.title}")),
+                SizedBox(height: 700,)
+              ]
+            ) ,
+          ),
         ],
+//        child: Column(
+//          children: <Widget>[
+//            Container(
+//              height: 360,
+//                width: double.infinity,
+//                child:
+//            ,
+//            ),
+//
+//
+//          ],
+//        ),
       ),
     );
   }

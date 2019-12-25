@@ -94,7 +94,10 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+
+
+class _AuthCardState extends State<AuthCard>with
+    SingleTickerProviderStateMixin {
 
   authMode _mode =authMode.Login;
 
@@ -106,6 +109,36 @@ class _AuthCardState extends State<AuthCard> {
 };
   var _isLoading=false;
   final _passwordControler =TextEditingController();
+  //var containerHight = 260;
+   AnimationController _controller;
+   Animation<Size> _heightAnimation;
+   Animation<Offset> _slideAnimation;
+   Animation<double> _offsedAnimation;
+
+
+   @override
+  void initState() {
+    _controller =AnimationController(vsync: this,duration: Duration(milliseconds: 300));
+    super.initState();
+
+    _heightAnimation =Tween<Size>(begin: Size(double.infinity, 320,),end: Size(double.infinity,260)).
+    animate(CurvedAnimation(parent: _controller,curve: Curves.linear,));
+   // _heightAnimation.addListener(()=> setState((){}));
+
+     _offsedAnimation =Tween(begin: 0.0,end: 1.0,).animate(
+         CurvedAnimation(parent: _controller,curve:Curves.easeIn,
+     ));
+
+     _slideAnimation =Tween<Offset>(begin: Offset(0,-1.5),end: Offset(0,0)).animate(CurvedAnimation(
+       parent: _controller,curve: Curves.fastOutSlowIn
+     ));
+  }
+
+ @override
+  void dispose() {
+    _controller.dispose();
+        super.dispose();
+  }
 
   void _errorDiloag(String massage){
      showDialog(context:context,builder: (context){
@@ -146,11 +179,11 @@ class _AuthCardState extends State<AuthCard> {
       var erroMassage="could not authicte";
       _errorDiloag(erroMassage);
     }
-
+   _controller.forward();
     setState(() {
       _isLoading =false;
     });
-
+  _controller.reverse();
   }
 
   void _switchMode(){
@@ -158,105 +191,126 @@ class _AuthCardState extends State<AuthCard> {
       setState(() {
         _mode =authMode.Signup;
       });
+ _controller.forward();
     }else{
       setState(() {
         _mode =authMode.Login;
       });
+      _controller.reverse();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+     print("animations");
     final deviceSize=MediaQuery.of(context).size;
     return Card(
       shape: RoundedRectangleBorder(
          borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 8.0,
-      child: Container(
+      child: AnimatedContainer(
+       duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+        child: Container(
+          height: _mode ==authMode.Signup ? 370: 260,
+          //height: _heightAnimation.value.height,
 
-        height: _mode ==authMode.Signup ? 800: 800,
+          constraints: BoxConstraints(
+            minHeight: _mode ==authMode.Signup ? 370: 260,
+          ),
+          width: deviceSize.width*0.85,
+          padding: EdgeInsets.all(8),
 
-        constraints: BoxConstraints(
-          minHeight: _mode ==authMode.Signup? 800: 800,
-        ),
-        width: deviceSize.width*0.85,
-        padding: EdgeInsets.all(16),
 
-        child: Form(
-          key: key,
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'e-mail'),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value){
-                    if(value.isEmpty||!value.contains('@')){
-                      return "invalid email";
-                    }
-                    return null;
-                  },
-                  onSaved: (value){
-                    credentials['email']=value;
-                  },
-                ),
+          child: Form(
+            key: key,
+            child: SingleChildScrollView(
+              child: Column(
 
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'password'),
-                  //keyboardType: TextInputType.number,
-                  obscureText: true,
-                  controller: _passwordControler,
-                  validator: (value){
-                    if(value.isEmpty|| value.length <5){
-                      return "invalid password or short";
-                    }
-                    return null;
-                  },
-                  onSaved: (value){
-                    credentials['password']=value;
-                  },
-                ),
-
-                if(_mode==authMode.Signup)
+                children: <Widget>[
                   TextFormField(
-                    enabled: _mode==authMode.Signup,
-                    decoration: InputDecoration(
-                      labelText: 'confirm password',
-                    ),
-                    validator: _mode==authMode.Signup?(value){
-                      if(value !=_passwordControler.text){
-                        return "password do not match";
+                    decoration: InputDecoration(labelText: 'e-mail'),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value){
+                      if(value.isEmpty||!value.contains('@')){
+                        return "invalid email";
                       }
                       return null;
-                    }:null,
+                    },
+                    onSaved: (value){
+                      credentials['email']=value;
+                    },
                   ),
-                SizedBox(height: 20,),
 
-                if(_isLoading)
-                  CircularProgressIndicator()
-                else RaisedButton(
-                  child: Text(_mode==authMode.Login ?"login":"sing up"),
-                onPressed: _sumbit,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30)
-                ),
-                  padding: EdgeInsets.symmetric(horizontal: 30.0,vertical: 8.0),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Theme.of(context).primaryTextTheme.button.color,
-                ),
-                FlatButton(
-                  child: Text("${_mode==authMode.Login ?"sing up":"login"} insted",
-                    style: TextStyle(color: Colors.blue),),
-                  onPressed: _switchMode,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'password'),
+                    //keyboardType: TextInputType.number,
+                    obscureText: true,
+                    controller: _passwordControler,
+                    validator: (value){
+                      if(value.isEmpty|| value.length <5){
+                        return "invalid password or short";
+                      }
+                      return null;
+                    },
+                    onSaved: (value){
+                      credentials['password']=value;
+                    },
+                  ),
 
-                )
-              ],
-            )
-          ),
+
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeIn,
+                      constraints: BoxConstraints(
+                          minHeight: _mode==authMode.Signup?60:0,
+                          maxHeight: _mode == authMode.Signup?120:0,),
+                      child: FadeTransition(
+                        opacity: _offsedAnimation,
+                        child: SlideTransition(
+                          position: _slideAnimation,
+                          child: TextFormField(
+                            enabled: _mode==authMode.Signup,
+                            decoration: InputDecoration(
+                              labelText: 'confirm password',
+                            ),
+                            validator: _mode==authMode.Signup?(value){
+                              if(value !=_passwordControler.text){
+                                return "password do not match";
+                              }
+                              return null;
+                            }:null,
+                          ),
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 20,),
+
+                  if(_isLoading)
+                    CircularProgressIndicator()
+                  else RaisedButton(
+                    child: Text(_mode==authMode.Login ?"login":"sing up"),
+                  onPressed: _sumbit,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)
+                  ),
+                    padding: EdgeInsets.symmetric(horizontal: 30.0,vertical: 8.0),
+                    color: Theme.of(context).primaryColor,
+                    textColor: Theme.of(context).primaryTextTheme.button.color,
+                  ),
+                  FlatButton(
+                    child: Text("${_mode==authMode.Login ?"sing up":"login"} insted",
+                      style: TextStyle(color: Colors.blue),),
+                    onPressed: _switchMode,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+
+                  )
+                ],
+              )
+            ),
+          ),)
         ),
-      ),
     );
   }
 }
