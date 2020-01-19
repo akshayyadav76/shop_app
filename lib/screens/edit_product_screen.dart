@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
+
 
 import '../providers/Product.dart';
 import '../providers/products.dart';
+import  'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const routeName = "/edit_product_screen";
@@ -14,9 +19,13 @@ class EditProductScreen extends StatefulWidget {
 class _EditProductScreenState extends State<EditProductScreen> {
   final _focuse = FocusNode();
   final _descriptionFocus = FocusNode();
-  final _editController = TextEditingController();
+
   final _imageUrl = FocusNode();
   final _formkey = GlobalKey<FormState>();
+  File gallorImage;
+   String imageName;
+   String  geturl ='';
+  final _editController = TextEditingController( );
 
   /// this is the end i have to fix save mathod of form
   var _editedProdcut = Product(
@@ -39,6 +48,28 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   void initState() {
     _imageUrl.addListener(updateImage);
+  }
+
+  Future<void>setimage()async{
+    final image= await ImagePicker.pickImage(source: ImageSource.gallery,
+    maxWidth: 600);
+    setState(() {
+      gallorImage =image;
+
+    });
+
+    final StorageReference ref = await FirebaseStorage.instance.ref().child("$imageName.jpg");
+    final StorageUploadTask upload = ref.putFile(gallorImage);
+    var url = await (await upload.onComplete).ref.getDownloadURL().then((aa){
+      setState(() {
+        geturl =aa.toString();
+        print(geturl);
+      });
+
+    });
+
+
+    //print(url.toString());
   }
 
   @override
@@ -136,6 +167,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(imageName);
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit Product"),
@@ -244,46 +276,63 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             ? Center(child: Text("Enter a URL"))
                             : FittedBox(
                                 fit: BoxFit.cover,
-                                child: Image.network(_editController.text),
+                                child: Image.network("https://firebasestorage.googleapis.com/v0/b/fir-9a1fe.appspot.com/o/u.jpg"),
                               ),
                       ),
-                      Expanded(
-                        child: TextFormField(
-                          decoration: InputDecoration(labelText: "Image URL"),
-                          keyboardType: TextInputType.url,
-                          controller: _editController,
-                          focusNode: _imageUrl,
-                          validator: (value) {
-                            if (value.isEmpty) {
-                              return "enter a url";
-                            }
-                            if (!value.startsWith("http") &&
-                                !value.startsWith("https")) {
-                              return "enter a valid url";
-                            }
-                            if (!value.endsWith("png") &&
-                                !value.endsWith("jpg") &&
-                                !value.endsWith("jpeg")) {
-                              return "enter a valid url";
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _editedProdcut = Product(
-                                id: _editedProdcut.id,
-                                title: _editedProdcut.title,
-                                price: _editedProdcut.price,
-                                description: _editedProdcut.description,
-                                imageUrl: value,
-                                isfavorite: _editedProdcut.isfavorite);
-                          },
-                          onFieldSubmitted: (value) {
-                            _saveForm();
-                          },
-                        ),
-                      ),
+//                      Expanded(
+//                        child: TextFormField(
+//                          decoration: InputDecoration(labelText: "Image URL"),
+//                          keyboardType: TextInputType.url,
+//                          controller: _editController,
+//                          focusNode: _imageUrl,
+//                          validator: (value) {
+//                            if (value.isEmpty) {
+//                              return "enter a url";
+//                            }
+//                            if (!value.startsWith("http") &&
+//                                !value.startsWith("https")) {
+//                              return "enter a valid url";
+//                            }
+//                            if (!value.endsWith("png") &&
+//                                !value.endsWith("jpg") &&
+//                                !value.endsWith("jpeg")) {
+//                              return "enter a valid url";
+//                            }
+//                            return null;
+//                          },
+//                          onSaved: (value) {
+//                            _editedProdcut = Product(
+//                                id: _editedProdcut.id,
+//                                title: _editedProdcut.title,
+//                                price: _editedProdcut.price,
+//                                description: _editedProdcut.description,
+//                                imageUrl: value,
+//                                isfavorite: _editedProdcut.isfavorite);
+//                          },
+//                          onFieldSubmitted: (value) {
+//                            _saveForm();
+//                          },
+//                        ),
+//                      ),
+
+
                     ],
                   ),
+                  TextField(
+                    decoration: InputDecoration(labelText: "image name"),
+                    onChanged: (a){
+                      setState(() {
+                        imageName = a;
+                      });
+
+                    },
+
+                  ),
+                  FlatButton(
+                    child: Text("pick image "),
+                    onPressed: setimage,
+                  ),
+
                 ],
               )),
     );
