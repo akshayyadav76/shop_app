@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -145,7 +146,6 @@ Products(this.token,this.userId,this._items,);
     if(productIndex>=0){
       final url="https://fir-9a1fe.firebaseio.com/products/$id.json?auth=$token";
      await http.patch(url,body: json.encode({
-
         "title": newProcut.title,
         "description": newProcut.description,
         "price": newProcut.price,
@@ -154,6 +154,7 @@ Products(this.token,this.userId,this._items,);
       }));
       _items[productIndex] =newProcut;
       notifyListeners();
+      print("blanck screen");
     }else{
       print("dd");
     }

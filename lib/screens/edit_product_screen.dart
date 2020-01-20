@@ -45,10 +45,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
     "imageUrl": "",
   };
 
-  @override
-  void initState() {
-    _imageUrl.addListener(updateImage);
-  }
+//  @override
+//  void initState() {
+//    _imageUrl.addListener(updateImage);
+//  }
 
   Future<void>setimage()async{
     final image= await ImagePicker.pickImage(source: ImageSource.gallery,
@@ -64,7 +64,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
       setState(() {
         geturl =aa.toString();
         print(geturl);
+         _editedProdcut = Product(
+                          id: _editedProdcut.id,
+                          title: _editedProdcut.title,
+                          price: _editedProdcut.price,
+                          description: _editedProdcut.description,
+                          imageUrl: geturl,
+                          isfavorite: _editedProdcut.isfavorite);
       });
+      print(_editedProdcut.imageUrl);
 
     });
 
@@ -82,29 +90,32 @@ class _EditProductScreenState extends State<EditProductScreen> {
           "title": _editedProdcut.title,
           "description": _editedProdcut.description,
           "price": _editedProdcut.price.toString(),
-          "imageUrl": "",
+          //"imageUrl": _editedProdcut.imageUrl,
         };
-        _editController.text = _editedProdcut.imageUrl;
+        print(_editedProdcut.imageUrl);
+        print(_editedProdcut.id);
+        geturl = _editedProdcut.imageUrl;
+        //_editController.text = _editedProdcut.imageUrl;
       }
     }
     isInit = false;
     super.didChangeDependencies();
   }
 
-  void updateImage() {
-    if (!_imageUrl.hasFocus) {
-      if (_editController.text.isEmpty ||
-          (!_editController.text.startsWith("http") &&
-              !_editController.text.startsWith("https")) ||
-          (!_editController.text.endsWith('png') &&
-              !_editController.text.endsWith('jpg') &&
-              !_editController.text.endsWith('jpeg'))) {
-        return;
-      }
-
-      setState(() {});
-    }
-  }
+//  void updateImage() {
+//    if (!_imageUrl.hasFocus) {
+//      if (_editController.text.isEmpty ||
+//          (!_editController.text.startsWith("http") &&
+//              !_editController.text.startsWith("https")) ||
+//          (!_editController.text.endsWith('png') &&
+//              !_editController.text.endsWith('jpg') &&
+//              !_editController.text.endsWith('jpeg'))) {
+//        return;
+//      }
+//
+//      setState(() {});
+//    }
+//  }
 
   Future<void>  _saveForm() async{
     setState(() {
@@ -124,8 +135,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Navigator.of(context).pop();
     } else {
       try{
+        print(_editedProdcut.imageUrl);
         await Provider.of<Products>(context, listen: false)
             .addProduct(_editedProdcut);
+        Navigator.of(context).pop();
       }catch(err){
        await showDialog(
             context: context,
@@ -153,7 +166,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     setState(() {
       isProgress = false;
     });
-    Navigator.of(context).pop();
+    //Navigator.of(context).pop();
   }
 
   @override
@@ -161,13 +174,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _focuse.dispose();
     _descriptionFocus.dispose();
     _editController.dispose();
-    _imageUrl.removeListener(updateImage);
+    //_imageUrl.removeListener(updateImage);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print(imageName);
+    //print(imageName);
     return Scaffold(
       appBar: AppBar(
         title: Text("Edit Product"),
@@ -272,11 +285,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey, width: 1)),
                         margin: EdgeInsets.only(top: 8, right: 10),
-                        child: _editController.text.isEmpty
+                        child: geturl.isEmpty
                             ? Center(child: Text("Enter a URL"))
                             : FittedBox(
                                 fit: BoxFit.cover,
-                                child: Image.network("https://firebasestorage.googleapis.com/v0/b/fir-9a1fe.appspot.com/o/u.jpg"),
+                                child: Image.network(_editedProdcut.id == null ?
+                                geturl:_editedProdcut.imageUrl),
                               ),
                       ),
 //                      Expanded(
